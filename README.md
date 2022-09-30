@@ -61,4 +61,4 @@ You can run and test the full project by running the following command:
 You can run and test the full project by running the following command:
 - `python NaiveBayesClassifier.py training.txt testing.txt`
 
-You can also test the program with your own `testing.txt` dataset file formatted in the same way as the given testing file.
+You can also test your own `testing.txt` dataset file formatted in the same way as the given testing file.
