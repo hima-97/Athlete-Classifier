@@ -39,7 +39,7 @@ To compute the result, we need to first test the data, which is done in the foll
 - Compute the log-likelihood for each column for each class
 - Sum the log-likelihood for all column for each class
 - Compare the log-likelihood for the two classes
-- Compare the accuracy.
+- Compare the accuracy
 
 Only the relative magnitude between the likelihood values are considered here.<br>
 Summing the Log-likelihood value consists of simply multiplying them, because of the Naive Bayes conditional independence assumption. <br>
