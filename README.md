@@ -1,7 +1,6 @@
 # Project Description
 
-This project consists of implementing an artificial intelligence (AI) program that automatically predicts the performance of different olympic athletes. <br>
-This program allows the user to predict with an accuracy of 77.5% which athletes will perform well and which athletes won't. <br>
+This project consists of implementing an artificial intelligence (AI) program that automatically predicts the performance of different olympic athletes. This program allows the user to predict with an accuracy of 77.5% which athletes will perform well and which athletes won't. <br>
 
 A Naive Baise Classifier is constructed to accurately classify each player's performance. <br>
 Players with high performance grade are labeled 1 and players with not high perforance grade are labeled 0. <br> <br>
