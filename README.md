@@ -30,7 +30,7 @@ label is significantly higher than all the rest. <br>
 The other columns have negligible correlation, so they are dropped from the data to avoid overfitting. <br>
 To summarize, each instance is represented by its feature columns only. <br>
 
-"sit_and_bend_forward_cm" and "sit_up_count" are modeled as two independent univariate Gaussian random variables. <br>
+Both "sit_and_bend_forward_cm" and "sit_up_count" are modeled as two independent univariate Gaussian random variables.
 Note that the independent part is a constraint of the Naive Bayes model. <br>
 A Gaussian random variable can be uniquely described by its mean and variance, both which can be computed by using two APIs from the `pandas` library. <br>
 Note how the mean and the variances for thee variables are computed after the data is separated by its class label. <br>
