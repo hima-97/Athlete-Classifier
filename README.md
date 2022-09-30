@@ -13,7 +13,7 @@ Columns are separated by commas, with the first 11 columns as features and the 1
 The name of the 11 columns in order are the following: age, gender, height_cm, weight_kg, body fat_%, diastolic, systolic, grip_force, sit_and_bend_forward_cm, sit_up_count, broad_jump_cm.
 The target column is named class. <br>
 
-After running the program on the `testing.txt` dataset file a label (0 or 1) is printed for each athlete's performance, one label per line. At the end, the program also prints the accuracy (77.5%) of the Naive Bayes Classifier (i.e. prediction).
+After testing the `testing.txt` dataset file a label (0 or 1) is printed for each athlete's performance, one label per line. At the end, the program also prints the accuracy (77.5%) of the Naive Bayes Classifier (i.e. prediction).
 
 # Implementation Details:
 
