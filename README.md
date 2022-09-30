@@ -3,10 +3,10 @@
 This project consists of implementing an artificial intelligence (AI) program that automatically predicts the performance of different olympic athletes based on a series of features. This program allows the user to predict with an accuracy of 77.5% which athletes will perform well and which ones won't. <br>
 
 A Naive Baise Classifier is constructed to accurately classify each athlete's performance. <br>
-Athletes with high performance grade are labeled 1 and athletes with not high perforance grade are labeled 0. <br> <br>
+Athletes with high performance grade are labeled 1 and athletes with not high perforance grade are labeled 0. <br>
 
 A `training.txt` dataset file is used to train the Naive Bayes Classifier to accurately predict a athlete's performance. <br>
-A `testing.txt` dataset file is then used to test the accuracy of the Naive Bayes Classifier. <br> <br>
+A `testing.txt` dataset file is then used to test the accuracy of the Naive Bayes Classifier. <br>
 
 Each of these files has an arbitrary number of rows and 12 columns. <br>
 Columns are separated by commas, with the first 11 columns as features and the 12th as the performance label.  <br>
@@ -30,7 +30,7 @@ label is significantly higher than all the rest. <br>
 The other columns have negligible correlation, so they are dropped from the data to avoid overfitting. <br>
 To summarize, each instance is represented by its feature columns only. <br>
 
-The two columns "sit_and_bend_forward_cm" and "sit_up_count" are modeled as two independent univariate Gaussian random variables. <br>
+"sit_and_bend_forward_cm" and "sit_up_count" are modeled as two independent univariate Gaussian random variables. <br>
 Note that the independent part is a constraint of the Naive Bayes model. <br>
 A Gaussian random variable can be uniquely described by its mean and variance, both which can be computed by using two APIs from the `pandas` library. <br>
 Note how the mean and the variances for thee variables are computed after the data is separated by its class label. <br>
