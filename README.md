@@ -2,10 +2,10 @@
 
 This project consists of implementing an artificial intelligence (AI) program that automatically predicts the performance of different olympic athletes. This program allows the user to predict with an accuracy of 77.5% which athletes will perform well and which athletes won't. <br>
 
-A Naive Baise Classifier is constructed to accurately classify each player's performance. <br>
-Players with high performance grade are labeled 1 and players with not high perforance grade are labeled 0. <br> <br>
+A Naive Baise Classifier is constructed to accurately classify each athlete's performance. <br>
+Athletes with high performance grade are labeled 1 and athletes with not high perforance grade are labeled 0. <br> <br>
 
-A `training.txt` dataset file is used for training the Naive Bayes Classifier to accurately predict a player's performance. <br>
+A `training.txt` dataset file is used to train the Naive Bayes Classifier to accurately predict a athlete's performance. <br>
 A `testing.txt` dataset file is then used to test the accuracy of the Naive Bayes Classifier. <br> <br>
 
 Each of these files has an arbitrary number of rows and 12 columns. <br>
