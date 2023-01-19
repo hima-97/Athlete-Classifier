@@ -20,6 +20,19 @@ After testing the `testing.txt` dataset file a label (0 or 1) is printed for eac
 The program depends on `pandas` and its dependencies. <br>
 The code contains no functions and no classes. <br>
 
+The program uses the Naive Bayes rule, which states that: <br>
+the probability of a class given the provided data (P(class|data)) is equal to the product of the probability of the data given the class (P(data|class)) and the probability of the class (P(class)), divided by the probability of the data (P(data)). <br>
+
+To accomplish this, the program first reads in a training dataset file called "training.txt" and a testing dataset file called "testing.txt" using the pandas library, and then performs minimal pre-processing on the data. The data is first cleaned by adding column names and then by selecting only the "sit_and_bend_forward_cm" and "sit_up_count" columns, which were found to have a higher correlation with the label than the other columns. This step is important because it prevents overfitting and makes the model more robust. <br>
+
+The program then models the selected columns as two independent univariate Gaussian random variables, which can be described by their mean and variance. These are computed by using APIs from the pandas library, after the data is separated by its class label. <br>
+
+The program then uses the training data to train the classifier and test the accuracy by using testing data set, also it computes the log-likelihood for each column for each class, summing the log-likelihood for all columns for each class and then comparing the log-likelihood for the two classes. The accuracy of the Naive Bayes classifier is also computed and printed. <br>
+
+The program also suggests some ideas to improve the accuracy of the classifier, such as further segregating the data set into male and female, excluding some athlete's attributes, and giving more importance to those that influence more an athlete's class. <br>
+
+Overall, this project demonstrates a solid understanding of machine learning concepts and implementation using python, as well as an understanding of how to work with data using pandas library. It also shows an ability to pre-process data, train and test a machine learning model, and make predictions based on the data. <br> <br> <br>
+
 Besides reading from the files through the pandas API, the data is minimally pre-processed by:
 - Add a column name to data frame
 - Select "sit_and_bend_forward_cm" and "sit_up_count" columns only, by discarding the rest
