@@ -2,92 +2,138 @@ import sys
 import math
 import pandas as pd
 
-# Naive Bayes rule:
-# 		P(class|data) = (P(data|class) * P(class)) / P(data)
-# Where P(class|data) is the probability of a class given the provided data.
+# Column names for the dataset
+column_names = ["age", "gender", "height_cm", "weight_kg", "body_fat_%", "diastolic", "systolic", "grip_force", 
+                "sit_and_bend_forward_cm", "sit_up_count", "broad_jump_cm", "label"]
 
-# Rather than attempting to calculate the probabilities of each attribute value,
-# they are assumed to be conditionally independent given the class value.
-# Therefore, we need to calculate the probability of data by the class they belong to, the so-called base rate.
-# This means that we first need to separate our training data by class.
+# Selected features for the classifier
+features = ["sit_and_bend_forward_cm", "sit_up_count"]
 
-# These are given column names:
-column_names = ["age", "gender", "height_cm", "weight_kg", "body fat_%","diastolic", "systolic", "grip_force", "sit_and_bend_forward_cm", "sit_up_count", "broad_jump_cm", "label"]
+def load_data(file_path, has_labels=True):
+    """
+    Load data from a CSV file and assign column names.
+    Args:
+    - file_path: path to the CSV file.
+    - has_labels: boolean indicating if the file has label column.
+    Returns:
+    - data: pandas DataFrame with the loaded data.
+    """
+    try:
+        data = pd.read_csv(file_path, header=None)
+        data.columns = column_names[:len(data.columns)] if has_labels else column_names[:-1]
+        return data
+    except FileNotFoundError:
+        print(f"Error: The file {file_path} was not found.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
 
-# These features are hand picked:
-features = ["sit_and_bend_forward_cm","sit_up_count"]
+def preprocess_data(data):
+    """
+    Preprocess the data by segregating it based on labels and gender.
+    Args:
+    - data: pandas DataFrame with the loaded data.
+    Returns:
+    - Dictionary with segregated data based on gender and label.
+    """
+    return {
+        'm_model_0': data[(data["label"] == 0) & (data["gender"] == 'M')],
+        'm_model_1': data[(data["label"] == 1) & (data["gender"] == 'M')],
+        'f_model_0': data[(data["label"] == 0) & (data["gender"] == 'F')],
+        'f_model_1': data[(data["label"] == 1) & (data["gender"] == 'F')]
+    }
 
-# Step 1 - Reading training file:
-# Opening the training.txt file from 1st command line argument:
-training_file = open(sys.argv[1], 'r')
-training_file = open(sys.argv[1], 'r')
-train = pd.read_csv(training_file, header=None)
-train.columns = column_names
+def train_model(segregated_data):
+    """
+    Train the model by calculating the mean and variance for each feature.
+    Args:
+    - segregated_data: dictionary with segregated data.
+    Returns:
+    - models: dictionary with mean and variance for each feature in each class.
+    """
+    models = {}
+    for key, df in segregated_data.items():
+        models[key] = {
+            'mean': df[features].mean(),
+            'variance': df[features].var()
+        }
+    return models
 
-# Step 2 - Seggregate the data by label:
-train_0_M = train[(train["label"] == 0) & (train["gender"] == 'M')]
-train_1_M = train[(train["label"] == 1) & (train["gender"] == 'M')]
-train_0_F = train[(train["label"] == 0) & (train["gender"] == 'F')]
-train_1_F = train[(train["label"] == 1) & (train["gender"] == 'F')]
+def evaluate_model(test_data, models):
+    """
+    Evaluate the model on the test data.
+    Args:
+    - test_data: pandas DataFrame with the test data.
+    - models: dictionary with trained models.
+    Returns:
+    - test_data: pandas DataFrame with the predicted labels added.
+    """
+    test_features = test_data[features].copy()
 
-# Step 3 - Training by computing the mean and variance for each feature:
-m_model_mean_0 = train_0_M[features].mean()
-m_model_variance_0 = train_0_M[features].var()
-m_model_mean_1 = train_1_M[features].mean()
-m_model_variance_1 = train_1_M[features].var()
-f_model_mean_0 = train_0_F[features].mean()
-f_model_variance_0 = train_0_F[features].var()
-f_model_mean_1 = train_1_F[features].mean()
-f_model_variance_1 = train_1_F[features].var()
+    # Calculate the log-probability scores for each feature and each class
+    for feature in features:
+        for model_key, model_stats in models.items():
+            mean_val = model_stats['mean'][feature]
+            var_val = model_stats['variance'][feature]
+            score_column = f"{feature}_{model_key}"
+            test_features[score_column] = test_features[feature].apply(
+                lambda x: -math.log(var_val) - ((x - mean_val) ** 2) / (2 * var_val))
 
-# This should give us some idea on class separation:
-# print(m_model_mean_0)
-# print(m_model_mean_1)
-# print(f_model_mean_0)
-# print(f_model_mean_1)
+    # Sum the log-probability scores for each class
+    for gender in ['m', 'f']:
+        for label in [0, 1]:
+            score_cols = [f"{feature}_{gender}_model_{label}" for feature in features]
+            test_features[f"score_{gender}{label}"] = test_features[score_cols].sum(axis=1)
 
-# Step 4: Reading testing file
-testing_file = open(sys.argv[2], 'r')
-test = pd.read_csv(testing_file, header=None)
+    # Determine the predicted class based on the highest score
+    test_data["m_predicted"] = (test_features["score_m1"] > test_features["score_m0"]).astype(int)
+    test_data["f_predicted"] = (test_features["score_f1"] > test_features["score_f0"]).astype(int)
+    test_data["predicted"] = test_data.apply(
+        lambda row: row["m_predicted"] if row["gender"] == 'M' else row["f_predicted"], axis=1)
 
-# Note: unlike the given testing file, the user's testing file won't have the label column.
-# This is to make sure not to fail column name assignment.
-test.columns = column_names[0:len(test.columns)]
+    return test_data
 
-# Step 5 - Evaluate the model score:
-test_features = test[features].copy()
-for column in features:
-	m_mean_0 = m_model_mean_0[column]
-	m_variance_0 = m_model_variance_0[column]
-	m_mean_1 = m_model_mean_1[column]
-	m_variance_1 = m_model_variance_1[column]
-	f_mean_0 = f_model_mean_0[column]
-	f_variance_0 = f_model_variance_0[column]
-	f_mean_1 = f_model_mean_1[column]
-	f_variance_1 = f_model_variance_1[column]	
-	test_features[column+"_m0"] = test_features[column].apply(lambda x: - math.log(m_variance_0) - ((x - m_mean_0) ** 2)/2/m_variance_0)	
-	test_features[column+"_m1"] = test_features[column].apply(lambda x: - math.log(m_variance_1) - ((x - m_mean_1) ** 2)/2/m_variance_1)
-	test_features[column+"_f0"] = test_features[column].apply(lambda x: - math.log(f_variance_0) - ((x - f_mean_0) ** 2)/2/f_variance_0)	
-	test_features[column+"_f1"] = test_features[column].apply(lambda x: - math.log(f_variance_1) - ((x - f_mean_1) ** 2)/2/f_variance_1)
+def print_predictions(test_data):
+    """
+    Print the predicted labels.
+    Args:
+    - test_data: pandas DataFrame with the predicted labels.
+    """
+    for predicted in test_data["predicted"].to_list():
+        print(predicted)
 
-test_features["score_m0"] = test_features[[x+"_m0" for x in features]].sum(axis=1)
-test_features["score_m1"] = test_features[[x+"_m1" for x in features]].sum(axis=1)
-test_features["score_f0"] = test_features[[x+"_f0" for x in features]].sum(axis=1)
-test_features["score_f1"] = test_features[[x+"_f1" for x in features]].sum(axis=1)
+def compute_accuracy(test_data):
+    """
+    Compute and print the accuracy of the predictions.
+    Args:
+    - test_data: pandas DataFrame with the predicted and actual labels.
+    """
+    if 'label' in test_data.columns:
+        test_data["accuracy"] = (test_data["label"] == test_data["predicted"]).astype(int)
+        accuracy = test_data["accuracy"].mean() * 100
+        print(f"Accuracy: {accuracy:.2f}%")
 
-test["m_predicted"] = test_features["score_m1"] > test_features["score_m0"] 
-test["m_predicted"] = test["m_predicted"].apply(lambda x: 1 if x else 0)
-test["f_predicted"] = test_features["score_f1"] > test_features["score_f0"] 
-test["f_predicted"] = test["f_predicted"].apply(lambda x: 1 if x else 0)
-test["m"] = test["gender"].apply(lambda x: 1 if x=='M' else 0)
-test["f"] = test["gender"].apply(lambda x: 0 if x=='M' else 1)
-test["predicted"] = test["m"] * test["m_predicted"] + test["f"] * test["f_predicted"]
+def main():
+    if len(sys.argv) != 3:
+        print("Usage: python NaiveBayesClassifier.py <training_file> <testing_file>")
+        sys.exit(1)
 
-# Step 6: Print the result
-for predicted in test["predicted"].to_list():
-	print(predicted)
+    train_file_path = sys.argv[1]
+    test_file_path = sys.argv[2]
 
-# Step 7: Compute accuracy percentage for local testing:
-test["accuracy"] = test["label"] == test["predicted"]
-test["accuracy"] = test["accuracy"].apply(lambda x: 1 if x else 0)
-print(test["accuracy"].mean())
+    # Load and preprocess the training data
+    train_data = load_data(train_file_path)
+    segregated_data = preprocess_data(train_data)
+    models = train_model(segregated_data)
+
+    # Load and evaluate the test data
+    test_data = load_data(test_file_path, has_labels=False)
+    evaluated_test_data = evaluate_model(test_data, models)
+    
+    # Print predictions and compute accuracy
+    print_predictions(evaluated_test_data)
+    compute_accuracy(evaluated_test_data)
+
+if __name__ == "__main__":
+    main()
