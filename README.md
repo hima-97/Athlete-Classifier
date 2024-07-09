@@ -62,7 +62,6 @@ To further improve the accuracy:
    ```bash
    pip install pandas
 
-
 Run the project with the following command:
 ```bash
    python NaiveBayesClassifier.py training.txt testing.txt
