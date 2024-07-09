@@ -58,6 +58,7 @@ To further improve the accuracy:
 ## Running and Testing the Project
 
 1. Clone the repository to your local machine.
+
 2. Ensure you have the `pandas` library installed:
    ```bash
    pip install pandas
