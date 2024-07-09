@@ -64,4 +64,5 @@ To further improve the accuracy:
 
 
 Run the project with the following command:
-python NaiveBayesClassifier.py training.txt testing.txt
+```bash
+   python NaiveBayesClassifier.py training.txt testing.txt
